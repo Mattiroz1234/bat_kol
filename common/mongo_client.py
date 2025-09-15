@@ -41,16 +41,29 @@ class MongoConnection:
             logger.exception(f"Get collection failed (name={name})")
             raise f"Get collection failed ({name}): {e}" from e
 
-    def insert(self, coll: str, doc: Dict[str, Any]) -> str:
+    def insert(self, coll: str, doc: Dict[str, Any], _id: Any = None) -> str:
         try:
             col = self.get_collection(coll)
+            if _id is not None:
+                doc["_id"] = _id
             result = col.insert_one(doc)
-            _id = str(result.inserted_id)
-            logger.info(f"Inserted document into '{coll}' with _id={_id}")
-            return _id
+            final_id = str(result.inserted_id)
+            logger.info(f"Inserted document into '{coll}' with _id={final_id}")
+            return final_id
+
         except Exception as e:
             logger.exception(f"Insert failed (coll={coll}, doc_keys={list(doc.keys())})")
-            raise f"Insert failed ({coll}): {e}" from e
+            raise RuntimeError(f"Insert failed ({coll}): {e}") from e
+
+    def check_exists_by_id(self, coll: str, _id: Any) -> bool:
+        try:
+            col = self.get_collection(coll)
+            return col.find_one({"_id": _id}) is not None
+        except Exception as e:
+            logger.exception(f"check_exists_by_id failed (coll={coll}, _id={_id})")
+            raise RuntimeError(f"check_exists_by_id failed ({coll}): {e}") from e
+
+
 
     def find_one(self, coll: str, query: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         try:
