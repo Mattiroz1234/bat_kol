@@ -10,6 +10,7 @@ class AppSettings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     # ---- MongoDB ----
+
     MONGO_URL: AnyUrl = Field("mongodb://localhost:27017", description="Mongo connection string")
     MONGO_DB: str = Field("matchmaking", description="Mongo database name")
     MONGO_COLL_PROFILES: str = Field("profiles", description="mongo collection for profiles")
