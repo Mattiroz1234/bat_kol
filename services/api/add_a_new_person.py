@@ -1,60 +1,72 @@
-from typing import Literal, List
-from fastapi import APIRouter, File, UploadFile,FastAPI
+from fastapi import FastAPI, UploadFile, File, Depends
 from fastapi.responses import JSONResponse
-from maid_a_unike_id import Create_hash
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Literal, List, Optional
+from maid_a_unike_id import Create_hash
+from common.mongo_client import MongoConnection
+from common.kafka_producer import Producer
+from common.config import settings
+from common.logger import Logger
+import base64
 import uvicorn
-import subprocess
 
-# router = APIRouter()
+logger = Logger.get_logger(name=__name__)
+mongo = MongoConnection()
+create_hash = Create_hash()
+producer = Producer()
+
 app = FastAPI()
-maid_hash_from_email = Create_hash()
 
-class AddPerson(BaseModel):
-
-    first_name: str = Field(..., description="שם פרטי של המשתמש")
-    last_name: str = Field(..., description="שם משפחה של המשתמש")
-    age: int = Field(..., ge=18, le=120, description="גיל המשתמש, חייב להיות בין 18 ל-120")
-    location: str = Field(..., description="עיר מגורים")
-    gender: Literal["Male", "Female"] = Field(..., description="מגדר של המשתמש")  # Male=זכר, Female=נקבה
-    marital_status: Literal["Single", "Divorced", "Widower"] = Field(...,description="מצב משפחתי")  # Single=רווק, Divorced=גרוש, Widower=אלמן
-    origin: Literal["ספרדי", "אשכנזי", "תימני"] = Field(..., description="מוצא אתני של המשתמש")
-    sector: Literal["חסידי", "ליטאי", "ספרדי"] = Field(..., description="מגזר של המשתמש")
-    occupation: Optional[str] = Field(None, description="עיסוק של המשתמש (אופציונלי)")
-    favorites: Optional[List[str]] = Field(None, description="תחביבים או דברים אהובים (אופציונלי)")
-    photo: Optional[str] = Field(None, description="קישור או נתיב לתמונה של המשתמש")
-    height: Optional[int] = Field(None, description="גובה המשתמש ")
-    free_text_self: str = Field(..., description="טקסט חופשי על המשתמש")
-    free_text_for_search: str = Field(..., description="טקסט חופשי לשימוש בחיפוש/התאמה")
+email = "ertyuioiuytrfdsdfg"
+database = {}
 
 
+class PersonModel(BaseModel):
+    first_name: str = Field(...)
+    last_name: str = Field(...)
+    age: int = Field(..., ge=18, le=120)
+    location: str = Field(...)
+    gender: Literal["Male", "Female"]
+    marital_status: Literal["Single", "Divorced", "Widower"]
+    origin: Literal["ספרדי", "אשכנזי", "תימני"]
+    sector: Literal["חסידי", "ליטאי", "ספרדי"]
+    free_text_self: str
+    free_text_for_search: str
+    occupation: Optional[str] = None
+    favorites: Optional[List[str]] = None
+    height: Optional[int] = None
 
-async def upload_image(file: UploadFile = File(...)):
-
-    contents = await file.read()
-    with open(f"uploaded_{file.filename}", "wb") as f:
-        f.write(contents)
-
-    return JSONResponse({"filename": file.filename, "size": len(contents)})
 
 
-database = []
+async def build_person(person: PersonModel, file: Optional[UploadFile] = File(None)):
+    data = person.dict()
+    if file:
+        contents = await file.read()
+        data["photo"] = base64.b64encode(contents).decode("utf-8")
+    else:
+        data["photo"] = None
+    return data
 
 
 @app.post("/add_person")
-def add_person(person: AddPerson):
-    # unike_id = maid_hash_from_email.made_a_hash(email)
-    database.append(person)
-    person_json = person.dict()
-    photo = upload_image()
-    return {"unike_id": "unike_id", "person": person_json}
+async def add_person(person: PersonModel = Depends(), file: Optional[UploadFile] = File(None)):
+    person_data = await build_person(person, file)
+    person_id = create_hash.made_a_hash(email)
+    logger.info("create a id")
+    mongo.insert(settings.MONGO_COLL_PROFILES, {"unique_id": person_id, **person_data})
+    logger.info(f"inserted to mongo {settings.MONGO_COLL_PROFILES} collection :")
+    if producer.ready:
+        person_to_kafka = {"id":person_id,**person_data}
+        producer.send_message(settings.TOPIC_PROFILES_CREATED,person_to_kafka)
+        logger.info(f"send to kafka in {settings.TOPIC_PROFILES_CREATED} topic::")
+    return JSONResponse({"status": "ok", "person_id": person_id})
 
 
 @app.get("/people")
 def get_people():
-    return database
+    all_collection = mongo.get_collection(settings.MONGO_COLL_PROFILES)
+    return all_collection
 
 
 if __name__ == "__main__":
-    uvicorn.run("add_a_new_person:app", host="127.0.0.1", port=8000)
+    uvicorn.run("add_a_new_person:app", host="127.0.0.1", port=8000, reload=True)
