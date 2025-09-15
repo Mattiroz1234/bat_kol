@@ -12,6 +12,7 @@ class AppSettings(BaseSettings):
     # ---- MongoDB ----
     MONGO_URL: AnyUrl = Field("mongodb://mongo:27017", description="Mongo connection string")
     MONGO_DB: str = Field("matchmaking", description="Mongo database name")
+    MONGO_COLL_PROFILES: str = Field("profiles",description="mongo collection for profiles")
 
     # ---- Elasticsearch ----
     ES_URL: AnyUrl = Field("http://elasticsearch:9200", description="Elasticsearch base URL")
