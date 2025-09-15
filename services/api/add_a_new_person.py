@@ -1,14 +1,18 @@
 from typing import Literal, List
-from fastapi import FastAPI
+from fastapi import APIRouter, File, UploadFile,FastAPI
+from fastapi.responses import JSONResponse
+from maid_a_unike_id import Create_hash
 from pydantic import BaseModel, Field
-from
 from typing import Optional
 import uvicorn
+import subprocess
 
+# router = APIRouter()
 app = FastAPI()
-
+maid_hash_from_email = Create_hash()
 
 class AddPerson(BaseModel):
+
     first_name: str = Field(..., description="שם פרטי של המשתמש")
     last_name: str = Field(..., description="שם משפחה של המשתמש")
     age: int = Field(..., ge=18, le=120, description="גיל המשתמש, חייב להיות בין 18 ל-120")
@@ -26,14 +30,25 @@ class AddPerson(BaseModel):
 
 
 
+async def upload_image(file: UploadFile = File(...)):
+
+    contents = await file.read()
+    with open(f"uploaded_{file.filename}", "wb") as f:
+        f.write(contents)
+
+    return JSONResponse({"filename": file.filename, "size": len(contents)})
+
+
 database = []
+
 
 @app.post("/add_person")
 def add_person(person: AddPerson):
+    # unike_id = maid_hash_from_email.made_a_hash(email)
     database.append(person)
     person_json = person.dict()
-
-    return {"message": "Person added successfully", "person": person_json}
+    photo = upload_image()
+    return {"unike_id": "unike_id", "person": person_json}
 
 
 @app.get("/people")
@@ -42,4 +57,4 @@ def get_people():
 
 
 if __name__ == "__main__":
-    uvicorn.run("add_a_new_person:app", host="127.0.0.1", port=8000, reload=True)
+    uvicorn.run("add_a_new_person:app", host="127.0.0.1", port=8000)
