@@ -36,9 +36,9 @@ class Elastic:
             raise
 
     # ---------- helpers ----------
-    def exists(self, doc_id: str) -> bool:
+    def is_exists(self, doc_id: str) -> bool:
         try:
-            return self.es.exists(index=self.index_name, id=doc_id)
+            return bool(self.es.exists(index=self.index_name, id=doc_id))
         except Exception as e:
             logger.error(f"exists({doc_id}) error: {e}")
             return False
@@ -117,6 +117,15 @@ class Elastic:
         except Exception as e:
             logger.error(f"update_docs failed: {e}")
             return False
+
+    def search(self, index, query=None, knn=None, size=3):
+        try:
+            if knn:
+                return self.es.search(index=index, knn=knn, size=size)
+            elif query:
+                return self.es.search(index=index, query=query, size=size)
+        except Exception as e:
+            logger.error(f"search failed: {e}")
 
     # ---------- Query ----------
     def count(self) -> int:

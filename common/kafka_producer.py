@@ -11,7 +11,7 @@ logger = Logger.get_logger(name=__name__)
 class Producer:
     def __init__(self, bootstrap_servers: Optional[str] = None):
         self.producer: Optional[KafkaProducer] = None
-        brokers = bootstrap_servers or settings.KAFKA_BROKERS
+        brokers = bootstrap_servers or settings.KAFKA_BROKERSS
         try:
             self.producer = KafkaProducer(
                 bootstrap_servers=brokers,
@@ -41,7 +41,8 @@ class Producer:
             return False
         try:
             fut = self.producer.send(topic, key=key, value=value, headers=headers or [])
-            md = fut.get(timeout=timeout)
+            md = fut.get()
+            print( f"Kafka → topic={md.topic} partition={md.partition} offset={md.offset}")
             logger.info(
                 f"Kafka → topic={md.topic} partition={md.partition} offset={md.offset}"
             )
