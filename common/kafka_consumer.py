@@ -49,7 +49,7 @@ class Consumer:
             return
         try:
             for msg in self.consumer:
-                yield msg
+                print(msg)
         except Exception as e:
             logger.error(f"KafkaConsumer listen error: {e}")
 

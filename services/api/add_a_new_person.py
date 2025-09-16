@@ -11,17 +11,19 @@ import base64
 import uvicorn
 
 logger = Logger.get_logger(name=__name__)
+print(999)
 mongo = MongoConnection()
 create_hash = Create_hash()
 producer = Producer()
 
 app = FastAPI()
 
-email = "ertyuioiuytrfdsdfg"
+
 database = {}
 
 
 class PersonModel(BaseModel):
+    email:str = Field(...)
     first_name: str = Field(...)
     last_name: str = Field(...)
     age: int = Field(..., ge=18, le=120)
@@ -50,16 +52,24 @@ async def build_person(person: PersonModel, file: Optional[UploadFile] = File(No
 
 @app.post("/add_person")
 async def add_person(person: PersonModel = Depends(), file: Optional[UploadFile] = File(None)):
-    person_data = await build_person(person, file)
-    person_id = create_hash.made_a_hash(email)
-    logger.info("create a id")
-    mongo.insert(settings.MONGO_COLL_PROFILES, {"unique_id": person_id, **person_data})
-    logger.info(f"inserted to mongo {settings.MONGO_COLL_PROFILES} collection :")
-    if producer.ready:
+    # try:
+        print(78)
+        person_data = await build_person(person, file)
+        person_id = create_hash.made_a_hash(person.email)
+        if person_id in database:
+            return f"{person.email} already exist in the system !!!"
+        database[person_id] = person.email
+        logger.info("create a id")
+        mongo.insert(settings.MONGO_COLL_PROFILES, {"unique_id": person_id, **person_data})
+        logger.info(f"inserted to mongo {settings.MONGO_COLL_PROFILES} collection :")
         person_to_kafka = {"id":person_id,**person_data}
-        producer.send_message(settings.TOPIC_PROFILES_CREATED,person_to_kafka)
+        o = producer.send_message(settings.TOPIC_PROFILES_CREATED,person_to_kafka)
+        producer.flush_producer()
+        print(o)
         logger.info(f"send to kafka in {settings.TOPIC_PROFILES_CREATED} topic::")
-    return JSONResponse({"status": "ok", "person_id": person_id})
+        return JSONResponse({"status": "ok", "person_id": person_id})
+    # except Exception as e:
+    #     logger.error(f"not insert the new profile {e}")
 
 
 @app.get("/people")
