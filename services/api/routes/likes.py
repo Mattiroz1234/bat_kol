@@ -33,4 +33,5 @@ def save_feedback(feedback: Feedback):
         logger.info(f"The update of {feedback.actor_id} was successful:{refund}")
         return refund
     except Exception as e:
+        logger.error(f"Error saving feedback for user {feedback.actor_id}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
