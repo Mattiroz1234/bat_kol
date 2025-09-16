@@ -3,7 +3,7 @@ from common.mongo_client import mongo
 from common.config import settings
 from common.logger import Logger
 
-logger = Logger.get_logger()
+logger = Logger.get_logger(name=__name__)
 waiting_matches_router = APIRouter(prefix="/waiting_matches", tags=["waiting_matches"])
 
 feedback_collection = mongo.get_collection(settings.MONGO_COLL_LIKES)

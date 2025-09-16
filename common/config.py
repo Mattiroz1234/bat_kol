@@ -26,6 +26,7 @@ class AppSettings(BaseSettings):
     TOPIC_PROFILES_ENRICHED: str = "profiles.enriched"
     TOPIC_PREFERENCES_UPDATED: str = "preferences.updated"
     TOPIC_FEEDBACK_EVENTS: str = "feedback.events"
+    TOPIC_FEEDBACKS: str = "feedbacks"
 
     # ---- API / misc ----
     APP_ENV: str = Field("dev", description="dev | staging | prod")
