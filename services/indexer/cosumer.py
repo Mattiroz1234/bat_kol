@@ -1,6 +1,4 @@
 from sentence_transformers import SentenceTransformer
-
-
 from common.config import settings
 from common.es_client import Elastic
 from common.kafka_consumer import Consumer
@@ -10,7 +8,7 @@ from services.indexer.mongo_service import MongoService
 mongoService = MongoService()
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
-def consumer(topic:list = ["topic_22"], group_id:str = F'group_{"topic_2"}77'):
+def consumer(topic:list = [settings.TOPIC_PROFILES_CREATED], group_id:str = F'group_{settings.TOPIC_PROFILES_CREATED}'):
 
     cons = Consumer(topic , group_id)
     for profile in cons.listen():
@@ -24,8 +22,7 @@ def consumer(topic:list = ["topic_22"], group_id:str = F'group_{"topic_2"}77'):
         es = Elastic(settings.ES_URL, index_name)
         esr = ElasticService(index_name)
         profile_id = profile["unique_id"]
-        list_profiles_id = esr.match_search(profile_id)
-        mongoService.insert_match(profile_id ,list_profiles_id)
+        print(profile_id)
 
         es.upsert_doc(
             profile["unique_id"],
@@ -36,3 +33,9 @@ def consumer(topic:list = ["topic_22"], group_id:str = F'group_{"topic_2"}77'):
             },
             "true"
         )
+
+        list_profiles_id = esr.match_search(profile_id)
+        mongoService.insert_match(profile_id ,list_profiles_id)
+
+        for profile_match in list_profiles_id:
+            mongoService.insert_match(profile_match , [profile_id])

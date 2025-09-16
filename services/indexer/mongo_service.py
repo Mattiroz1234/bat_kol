@@ -4,7 +4,8 @@ class MongoService:
     def __init__(self):
         self.mongo_db = MongoConnection()
 
-    def insert_match(self, profile_id, list_profiles_id):
+    def insert_match(self, profile_id:str, list_profiles_id:list):
+
         if self.mongo_db.check_exists_by_id("likes", profile_id):
             self.mongo_db.update(
                 "likes",

@@ -1,6 +1,8 @@
 from common.es_client import Elastic
 from common.config import settings
+from common.logger import Logger
 
+logger = Logger.get_logger(name=__name__)
 
 class ElasticService:
     def __init__(self, index_name):
@@ -10,6 +12,9 @@ class ElasticService:
     def match_search(self,doc_id, size:int = 1):
 
         doc = self.es.get_doc(doc_id)
+        if not doc:
+            logger.warning(f"No document found for id {doc_id} in index {self.index}")
+            return
         print(doc)
         index_gender = "female" if self.index == "male" else "male"
 
@@ -41,6 +46,6 @@ class ElasticService:
 
         list_profile_id =[]
         for hit in resp["hits"]["hits"]:
-            list_profile_id.append({hit['_id']})
+            list_profile_id.append(hit['_id'])
 
         return list_profile_id

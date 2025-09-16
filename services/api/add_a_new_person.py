@@ -17,7 +17,7 @@ producer = Producer()
 
 app = FastAPI()
 
-email = "ertyuioiuytrfdsdfg"
+email = "ertyuioiuytrfdsdfgwwwee"
 database = {}
 
 
@@ -57,7 +57,7 @@ async def add_person(person: PersonModel = Depends(), file: Optional[UploadFile]
     mongo.insert(settings.MONGO_COLL_PROFILES, {"unique_id": person_id, **person_data}, person_id)
     logger.info(f"inserted to mongo {settings.MONGO_COLL_PROFILES} collection :")
     person_to_kafka = {"unique_id":person_id,**person_data}
-    producer.send_message("topic_22",person_to_kafka)
+    producer.send_message(settings.TOPIC_PROFILES_CREATED,person_to_kafka)
     producer.flush_producer()
     logger.info(f"send to kafka in {settings.TOPIC_PROFILES_CREATED} topic::")
     return JSONResponse({"status": "ok", "person_id": person_id})
