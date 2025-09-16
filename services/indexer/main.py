@@ -1,3 +1,7 @@
 from services.indexer.cosumer import consumer
 
-consumer()
+def main():
+    consumer()
+
+if __name__ == "__main__":
+    main()

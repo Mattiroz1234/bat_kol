@@ -15,7 +15,6 @@ class ElasticService:
         if not doc:
             logger.warning(f"No document found for id {doc_id} in index {self.index}")
             return
-        print(doc)
         index_gender = "female" if self.index == "male" else "male"
 
         text_self_vector = doc["text_self_vector"]

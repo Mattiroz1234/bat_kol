@@ -4,12 +4,12 @@ from common.config import settings
 from common.logger import Logger
 
 logger = Logger.get_logger(name=__name__)
-waiting_matches_router = APIRouter(prefix="/waiting_matches", tags=["waiting_matches"])
+router = APIRouter(prefix="/waiting_matches", tags=["waiting_matches"])
 
-feedback_collection = mongo.get_collection(settings.MONGO_COLL_LIKES)
+feedback_collection = mongo.get_collection(settings.MONGO_COLLECTION_LIKES)
 profiles_collection = mongo.get_collection(settings.MONGO_COLL_PROFILES)
 
-@waiting_matches_router.get("/{actor_id}")
+@router.get("/{actor_id}")
 def get_waiting_matches(actor_id: str):
     try:
         user_doc = feedback_collection.find_one({"_id": actor_id}, {"waiting": 1, "_id": 0})

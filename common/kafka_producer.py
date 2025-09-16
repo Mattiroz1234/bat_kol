@@ -11,7 +11,7 @@ logger = Logger.get_logger(name=__name__)
 class Producer:
     def __init__(self, bootstrap_servers: Optional[str] = None):
         self.producer: Optional[KafkaProducer] = None
-        brokers = bootstrap_servers or settings.KAFKA_BROKERS
+        brokers = bootstrap_servers or settings.KAFKA_BROKERSS
         try:
             self.producer = KafkaProducer(
                 bootstrap_servers=brokers,

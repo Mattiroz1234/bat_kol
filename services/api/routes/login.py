@@ -1,18 +1,15 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import HTTPException, APIRouter
 from pydantic import BaseModel
 from pymongo import MongoClient
 from jose import JWTError, jwt
 from datetime import datetime, timedelta, timezone
-from add_a_new_person import add_person
 import uvicorn
 
-from common.config import settings
+router = APIRouter(prefix="/login",tags=["login"])
 
-app = FastAPI()
-
-client = MongoClient(str(settings.MONGO_URL))
-db = client[settings.MONGO_DB]
-users = db[settings.MONGO_COLL_LOGINS]
+client = MongoClient("mongodb://localhost:27017/")
+db = client["mydb"]
+users = db["users"]
 
 SECRET_KEY = "mysecretkey"
 ALGORITHM = "HS256"
@@ -35,7 +32,7 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 
-@app.post("/login")
+@router.post("/login")
 def login(data: UserRequest):
     user = users.find_one({"email": data.email})
     if not user:
@@ -47,10 +44,10 @@ def login(data: UserRequest):
         {"sub": data.email},
         timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     )
-    return protected(TokenRequest(token=token))
+    return {"access_token": token}
 
 
-@app.post("/register")
+@router.post("/register")
 def register(data: UserRequest):
     user = users.find_one({"email": data.email})
     if user:
@@ -60,7 +57,7 @@ def register(data: UserRequest):
     return {"message": f"User {data.email} registered successfully!"}
 
 
-
+@router.post("/protected")
 def protected(data: TokenRequest):
     try:
         payload = jwt.decode(data.token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -73,4 +70,4 @@ def protected(data: TokenRequest):
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    uvicorn.run(router, host="127.0.0.1", port=8000)

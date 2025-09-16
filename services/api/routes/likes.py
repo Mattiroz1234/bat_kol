@@ -7,7 +7,7 @@ from common.mongo_client import mongo
 from common.kafka_producer import Producer
 
 logger = Logger.get_logger(name=__name__)
-likes_router = APIRouter(prefix="/likes",tags=["likes"])
+router = APIRouter(prefix="/likes",tags=["likes"])
 producer = Producer()
 feedback_collection = mongo.get_collection(settings.MONGO_COLLECTION_LIKES)
 KAFKA_TOPIC = settings.TOPIC_FEEDBACKS
@@ -17,7 +17,7 @@ class Feedback(BaseModel):
     target_id: str
     status: Literal["likes", "dislikes", "waiting"]
 
-@likes_router.post("/feedback")
+@router.post("/feedback")
 def save_feedback(feedback: Feedback):
     try:
         statuses = ["likes", "dislikes", "waiting"]

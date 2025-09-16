@@ -13,7 +13,7 @@ class MongoConnection:
     """Simple wrapper around pymongo for our services, with robust logging & error handling."""
 
     def __init__(self, uri: str = None, db_name: str = None):
-        self._uri = uri or str(settings.MONGO_URL)
+        self._uri = uri or str(settings.MONGO_URI)
         self._db_name = db_name or settings.MONGO_DB
         self._client: Optional[MongoClient] = None
         self._db = None
@@ -78,15 +78,22 @@ class MongoConnection:
     def update(self, coll: str, query: Dict[str, Any], update: Dict[str, Any]):
         try:
             col = self.get_collection(coll)
-            res = col.update_one(query, {"$set": update}, upsert=False)
+
+            if any(k.startswith("$") for k in update.keys()):
+                res = col.update_one(query, update, upsert=False)
+            else:
+                res = col.update_one(query, {"$set": update}, upsert=False)
+
             logger.info(
                 f"update_one on '{coll}' (matched={res.matched_count}, modified={res.modified_count}) "
-                f"query={query}, set_keys={list(update.keys())}"
+                f"query={query}, update_keys={list(update.keys())}"
             )
             return res
         except Exception as e:
-            logger.exception(f"update failed (coll={coll}, query={query}, update_keys={list(update.keys())})")
-            raise f"update failed ({coll}): {e}" from e
+            logger.exception(
+                f"update failed (coll={coll}, query={query}, update_keys={list(update.keys())})"
+            )
+            raise RuntimeError(f"update failed ({coll}): {e}") from e
 
     def close(self):
         try:

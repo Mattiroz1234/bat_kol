@@ -12,6 +12,7 @@ class MongoService:
                 {"profile_id": profile_id},
                 {"$addToSet": {"waiting": {"$each": list_profiles_id}}}
             )
+
         else:
             doc = {
                 "profile_id" : profile_id,
@@ -19,6 +20,6 @@ class MongoService:
                 "waiting" : list_profiles_id,
                 "dislikes" : []
             }
-            self.mongo_db.insert('likes',doc)
+            self.mongo_db.insert('likes',doc,profile_id)
 
 

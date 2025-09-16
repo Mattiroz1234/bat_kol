@@ -21,7 +21,7 @@ class Consumer:
         enable_auto_commit: bool = True,
     ):
         self.consumer: Optional[KafkaConsumer] = None
-        brokers = bootstrap_servers or settings.KAFKA_BROKERS
+        brokers = bootstrap_servers or settings.KAFKA_BROKERSS
         try:
             self.consumer = KafkaConsumer(
                 *topics,
@@ -49,7 +49,7 @@ class Consumer:
             return
         try:
             for msg in self.consumer:
-                print(msg)
+                yield msg
         except Exception as e:
             logger.error(f"KafkaConsumer listen error: {e}")
 
