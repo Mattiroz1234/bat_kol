@@ -2,8 +2,8 @@
 from pymongo import MongoClient
 from pymongo.collection import Collection
 from typing import Any, Dict, Optional
-from .config import settings
-from .logger import Logger
+from common.config import settings
+from common.logger import Logger
 
 
 logger = Logger.get_logger(name=__name__)
@@ -50,7 +50,8 @@ class MongoConnection:
             return _id
         except Exception as e:
             logger.exception(f"Insert failed (coll={coll}, doc_keys={list(doc.keys())})")
-            raise f"Insert failed ({coll}): {e}" from e
+            raise Exception(f"Insert failed ({coll}): {e}") from e
+
 
     def find_one(self, coll: str, query: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         try:
