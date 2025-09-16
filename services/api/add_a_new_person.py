@@ -18,6 +18,7 @@ producer = Producer()
 
 app = FastAPI()
 
+email = "ertyuioiuytrfdsdfgwwwee"
 
 database = {}
 
@@ -52,6 +53,7 @@ async def build_person(person: PersonModel, file: Optional[UploadFile] = File(No
 
 @app.post("/add_person")
 async def add_person(person: PersonModel = Depends(), file: Optional[UploadFile] = File(None)):
+
     # try:
         print(78)
         person_data = await build_person(person, file)
