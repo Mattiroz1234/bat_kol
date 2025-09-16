@@ -1,5 +1,6 @@
 import hashlib
-
+from common.kafka_consumer import Consumer
+from common.config import settings
 
 class Create_hash:
     def __init__(self):
@@ -17,3 +18,6 @@ class Create_hash:
 
         except Exception as e:
             print()
+
+# c = Consumer(settings.TOPIC_PROFILES_CREATED,"hggggggg")
+# c.listen()
