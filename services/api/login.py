@@ -3,13 +3,16 @@ from pydantic import BaseModel
 from pymongo import MongoClient
 from jose import JWTError, jwt
 from datetime import datetime, timedelta, timezone
+from add_a_new_person import add_person
 import uvicorn
+
+from common.config import settings
 
 app = FastAPI()
 
-client = MongoClient("mongodb://localhost:27017/")
-db = client["mydb"]
-users = db["users"]
+client = MongoClient(str(settings.MONGO_URL))
+db = client[settings.MONGO_DB]
+users = db[settings.MONGO_COLL_LOGINS]
 
 SECRET_KEY = "mysecretkey"
 ALGORITHM = "HS256"
@@ -44,7 +47,7 @@ def login(data: UserRequest):
         {"sub": data.email},
         timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     )
-    return {"access_token": token}
+    return protected(TokenRequest(token=token))
 
 
 @app.post("/register")
@@ -57,7 +60,7 @@ def register(data: UserRequest):
     return {"message": f"User {data.email} registered successfully!"}
 
 
-@app.post("/protected")
+
 def protected(data: TokenRequest):
     try:
         payload = jwt.decode(data.token, SECRET_KEY, algorithms=[ALGORITHM])

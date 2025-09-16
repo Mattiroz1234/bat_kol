@@ -2,8 +2,8 @@
 from pymongo import MongoClient
 from pymongo.collection import Collection
 from typing import Any, Dict, Optional
-from .config import settings
-from .logger import Logger
+from common.config import settings
+from common.logger import Logger
 
 
 logger = Logger.get_logger(name=__name__)
@@ -53,6 +53,7 @@ class MongoConnection:
 
         except Exception as e:
             logger.exception(f"Insert failed (coll={coll}, doc_keys={list(doc.keys())})")
+
             raise RuntimeError(f"Insert failed ({coll}): {e}") from e
 
     def check_exists_by_id(self, coll: str, _id: Any) -> bool:
@@ -62,7 +63,6 @@ class MongoConnection:
         except Exception as e:
             logger.exception(f"check_exists_by_id failed (coll={coll}, _id={_id})")
             raise RuntimeError(f"check_exists_by_id failed ({coll}): {e}") from e
-
 
 
     def find_one(self, coll: str, query: Dict[str, Any]) -> Optional[Dict[str, Any]]:
