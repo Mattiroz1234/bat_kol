@@ -52,13 +52,14 @@ async def build_person(person: PersonModel, file: Optional[UploadFile] = File(No
 async def add_person(person: PersonModel = Depends(), file: Optional[UploadFile] = File(None)):
     person_data = await build_person(person, file)
     person_id = create_hash.made_a_hash(email)
+    print(type(person_id))
     logger.info("create a id")
-    mongo.insert(settings.MONGO_COLL_PROFILES, {"unique_id": person_id, **person_data})
+    mongo.insert(settings.MONGO_COLL_PROFILES, {"unique_id": person_id, **person_data}, person_id)
     logger.info(f"inserted to mongo {settings.MONGO_COLL_PROFILES} collection :")
-    if producer.ready:
-        person_to_kafka = {"id":person_id,**person_data}
-        producer.send_message(settings.TOPIC_PROFILES_CREATED,person_to_kafka)
-        logger.info(f"send to kafka in {settings.TOPIC_PROFILES_CREATED} topic::")
+    person_to_kafka = {"unique_id":person_id,**person_data}
+    producer.send_message("topic_22",person_to_kafka)
+    producer.flush_producer()
+    logger.info(f"send to kafka in {settings.TOPIC_PROFILES_CREATED} topic::")
     return JSONResponse({"status": "ok", "person_id": person_id})
 
 

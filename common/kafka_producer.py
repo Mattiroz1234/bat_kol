@@ -41,7 +41,8 @@ class Producer:
             return False
         try:
             fut = self.producer.send(topic, key=key, value=value, headers=headers or [])
-            md = fut.get(timeout=timeout)
+            md = fut.get()
+            print( f"Kafka → topic={md.topic} partition={md.partition} offset={md.offset}")
             logger.info(
                 f"Kafka → topic={md.topic} partition={md.partition} offset={md.offset}"
             )

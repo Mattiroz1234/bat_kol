@@ -16,17 +16,17 @@ class AppSettings(BaseSettings):
     MONGO_COLL_PROFILES: str = Field("profiles", description="mongo collection for profiles")
 
     # ---- Elasticsearch ----
-    ES_URL: AnyUrl = Field("http://elasticsearch:9200", description="Elasticsearch base URL")
+    ES_URL: AnyUrl = Field("http://localhost:9200", description="Elasticsearch base URL")
     ES_INDEX_PROFILES: str = Field("profiles_v1", description="Profiles index name")
     ES_ALIAS_PROFILES: str = Field("profiles_active", description="Alias for blue/green")
 
     # ---- Kafka ----
-    KAFKA_BROKERS: str = Field("kafka:9092", description="Comma-separated brokers")
+    KAFKA_BROKERS: str = Field("localhost:9092", description="Comma-separated brokers")
     KAFKA_CLIENT_ID: str = Field("matchmaking-app", description="Kafka client.id")
-    TOPIC_PROFILES_CREATED: str = "profiles.created"
-    TOPIC_PROFILES_ENRICHED: str = "profiles.enriched"
-    TOPIC_PREFERENCES_UPDATED: str = "preferences.updated"
-    TOPIC_FEEDBACK_EVENTS: str = "feedback.events"
+    TOPIC_PROFILES_CREATED: str = "profiles_created"
+    TOPIC_PROFILES_ENRICHED: str = "profiles_enriched"
+    TOPIC_PREFERENCES_UPDATED: str = "preferences_updated"
+    TOPIC_FEEDBACK_EVENTS: str = "feedback_events"
 
     # ---- API / misc ----
     APP_ENV: str = Field("dev", description="dev | staging | prod")
