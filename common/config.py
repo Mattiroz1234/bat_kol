@@ -13,6 +13,10 @@ class AppSettings(BaseSettings):
     MONGO_URL: AnyUrl = Field("mongodb://mongo:27017", description="Mongo connection string")
     MONGO_DB: str = Field("matchmaking", description="Mongo database name")
     MONGO_COLL_PROFILES: str = Field("profiles",description="mongo collection for profiles")
+    MONGO_COLL_LIKES: str = Field("likes", description="likes collection name")
+    PROFILE_ID_FIELD: str = "profile_id"
+    LIKES_FIELD: str = "likes"
+    DISLIKES_FIELD: str = "dislikes"
 
     # ---- Elasticsearch ----
     ES_URL: AnyUrl = Field("http://elasticsearch:9200", description="Elasticsearch base URL")
@@ -25,7 +29,10 @@ class AppSettings(BaseSettings):
     TOPIC_PROFILES_CREATED: str = "profiles.created"
     TOPIC_PROFILES_ENRICHED: str = "profiles.enriched"
     TOPIC_PREFERENCES_UPDATED: str = "preferences.updated"
-    TOPIC_FEEDBACK_EVENTS: str = "feedback.events"
+    TOPIC_FEEDBACKS: str = "feedbacks"
+    TOPIC_NOTIFY_LIKE: str = "notify.like"
+    TOPIC_MATCHES: str = "matches.created"
+    KAFKA_GROUP_MATCH_ENGINE: str = "match_engine"
 
     # ---- API / misc ----
     APP_ENV: str = Field("dev", description="dev | staging | prod")
