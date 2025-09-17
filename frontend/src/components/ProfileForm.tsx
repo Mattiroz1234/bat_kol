@@ -53,8 +53,10 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ onProfileCreated }) => {
       if (response.person_id) {
         onProfileCreated(response.person_id);
       }
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'שגיאה ביצירת הפרופיל');
+    } catch (err: unknown) {
+        // @ts-expect-error: err is of type unknown
+        const errorMessage = err.response?.data?.error || 'שגיאה ביצירת הפרופיל';
+        setError(errorMessage);
     } finally {
       setLoading(false);
     }

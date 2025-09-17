@@ -28,6 +28,29 @@ export const authAPI = {
   }
 };
 
+// OpenAPI Schema API
+export const openApiAPI = {
+  getSchema: async () => {
+    const response = await api.get('/openapi.json');
+    return response.data;
+  },
+
+  makeRequest: async (method: string, path: string, params?: Record<string, unknown>, data?: Record<string, unknown>) => {
+    try {
+      const response = await api.request({
+        method,
+        url: path,
+        params,
+        data,
+      });
+      return response.data;
+    } catch (error: unknown) {
+      // @ts-expect-error: error is of type unknown
+      return error.response.data;
+    }
+  }
+};
+
 // Profile API
 export const profileAPI = {
   addPerson: async (userData: User, photo?: File) => {

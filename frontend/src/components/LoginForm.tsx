@@ -31,8 +31,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
         setError('');
         alert('נרשמת בהצלחה! כעת תוכל להתחבר');
       }
-    } catch (err: any) {
-      setError(err.response?.data?.detail || 'שגיאה בהתחברות');
+    } catch (err: unknown) {
+        // @ts-expect-error: err is of type unknown
+        const errorMessage = err.response?.data?.detail || 'שגיאה בהתחברות';
+        setError(errorMessage);
     } finally {
       setLoading(false);
     }

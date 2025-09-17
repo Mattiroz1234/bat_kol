@@ -13,21 +13,21 @@ const MatchesView: React.FC<MatchesViewProps> = ({ userId }) => {
   const [error, setError] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  useEffect(() => {
-    loadMatches();
-  }, [userId]);
-
-  const loadMatches = async () => {
+  const loadMatches = React.useCallback(async () => {
     try {
       setLoading(true);
       const response = await matchesAPI.getWaitingMatches(userId);
       setMatches(response.waiting || []);
-    } catch (err: any) {
+    } catch {
       setError('שגיאה בטעינת ההתאמות');
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    loadMatches();
+  }, [loadMatches]);
 
   const handleFeedback = async (status: 'likes' | 'dislikes') => {
     if (currentIndex >= matches.length) return;
@@ -50,7 +50,7 @@ const MatchesView: React.FC<MatchesViewProps> = ({ userId }) => {
       if (currentIndex >= newMatches.length && newMatches.length > 0) {
         setCurrentIndex(newMatches.length - 1);
       }
-    } catch (err) {
+    } catch {
       setError('שגיאה בשליחת המשוב');
     }
   };
