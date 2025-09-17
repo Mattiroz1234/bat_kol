@@ -4,6 +4,7 @@ import Layout from './components/Layout';
 import LoginForm from './components/LoginForm';
 import ProfileForm from './components/ProfileForm';
 import MatchesView from './components/MatchesView';
+import ApiExplorer from './components/ApiExplorer';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -78,6 +79,7 @@ function App() {
             path="/" 
             element={<MatchesView userId={userId} />} 
           />
+          <Route path="/api-explorer" element={<ApiExplorer />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Layout>

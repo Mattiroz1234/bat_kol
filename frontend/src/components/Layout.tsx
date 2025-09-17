@@ -1,5 +1,6 @@
 import React from 'react';
-import { Heart, Users, LogOut } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Heart, Users, LogOut, BookText } from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -32,6 +33,11 @@ const Layout: React.FC<LayoutProps> = ({
                   <Users className="h-5 w-5" />
                   <span className="text-sm">מחוברים יחד</span>
                 </div>
+
+                <Link to="/api-explorer" className="flex items-center space-x-2 space-x-reverse text-white/80 hover:text-white transition-colors">
+                  <BookText className="h-5 w-5" />
+                  <span className="text-sm">API Explorer</span>
+                </Link>
                 
                 {onLogout && (
                   <button
