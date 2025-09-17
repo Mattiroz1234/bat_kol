@@ -1,5 +1,5 @@
-from fastapi import HTTPException, APIRouter
-from pydantic import BaseModel
+from fastapi import HTTPException, APIRouter, Depends
+from pydantic import BaseModel, Field
 from pymongo import MongoClient
 from jose import JWTError, jwt
 from datetime import datetime, timedelta, timezone
@@ -10,7 +10,7 @@ from common.config import settings
 router = APIRouter(prefix="/login",tags=["login"])
 
 client = MongoClient(settings.MONGO_URI)
-db = client[settings.MONGO_DBMONGO_DB]
+db = client[settings.MONGO_DB]
 users = db["users"]
 
 SECRET_KEY = "mysecretkey"
@@ -19,12 +19,12 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 
 class UserRequest(BaseModel):
-    email: str
-    password: str
+    email: str = Field(...)
+    password: str = Field(...)
 
 
 class TokenRequest(BaseModel):
-    token: str
+    token: str = Field(...)
 
 
 def create_access_token(data: dict, expires_delta: timedelta = None):
@@ -35,7 +35,7 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
 
 
 @router.post("/login")
-def login(data: UserRequest):
+def login(data: UserRequest = Depends()):
     user = users.find_one({"email": data.email})
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -50,7 +50,7 @@ def login(data: UserRequest):
 
 
 @router.post("/register")
-def register(data: UserRequest):
+def register(data: UserRequest = Depends()):
     user = users.find_one({"email": data.email})
     if user:
         raise HTTPException(status_code=400, detail="User already exists")
@@ -60,7 +60,7 @@ def register(data: UserRequest):
 
 
 @router.post("/protected")
-def protected(data: TokenRequest):
+def protected(data: TokenRequest = Depends()):
     try:
         payload = jwt.decode(data.token, SECRET_KEY, algorithms=[ALGORITHM])
         email: str = payload.get("sub")

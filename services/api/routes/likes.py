@@ -1,7 +1,7 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from common.config import settings
 from common.logger import Logger
-from pydantic import BaseModel
+from pydantic import BaseModel,Field
 from typing import Literal
 from common.mongo_client import mongo
 from common.kafka_producer import Producer
@@ -13,12 +13,12 @@ feedback_collection = mongo.get_collection(settings.MONGO_COLLECTION_LIKES)
 KAFKA_TOPIC = settings.TOPIC_FEEDBACKS
 
 class Feedback(BaseModel):
-    actor_id: str
-    target_id: str
+    actor_id: str = Field(...)
+    target_id: str = Field(...)
     status: Literal["likes", "dislikes", "waiting"]
 
 @router.post("/feedback")
-def save_feedback(feedback: Feedback):
+def save_feedback(feedback: Feedback = Depends()):
     try:
         statuses = ["likes", "dislikes", "waiting"]
         others = [s for s in statuses if s != feedback.status]
