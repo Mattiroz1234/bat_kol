@@ -1,8 +1,9 @@
 import hashlib
-from common.kafka_consumer import Consumer
-from common.config import settings
+from common.logger import Logger
 
-class Create_hash:
+logger = Logger.get_logger(name=__name__)
+
+class CreateHash:
     def __init__(self):
         self.hash_code = None
 
@@ -17,7 +18,4 @@ class Create_hash:
             return self.hash_code
 
         except Exception as e:
-            print()
-
-# c = Consumer(settings.TOPIC_PROFILES_CREATED,"hggggggg")
-# c.listen()
+            logger.error(f"made id error: {e}")

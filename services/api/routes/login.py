@@ -5,10 +5,12 @@ from jose import JWTError, jwt
 from datetime import datetime, timedelta, timezone
 import uvicorn
 
+from common.config import settings
+
 router = APIRouter(prefix="/login",tags=["login"])
 
-client = MongoClient("mongodb://localhost:27017/")
-db = client["mydb"]
+client = MongoClient(settings.MONGO_URI)
+db = client[settings.MONGO_DBMONGO_DB]
 users = db["users"]
 
 SECRET_KEY = "mysecretkey"
