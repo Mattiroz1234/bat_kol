@@ -9,11 +9,11 @@ from common.logger import Logger
 import base64
 import uvicorn
 
-from services.api.maid_a_unike_id import Create_hash
+from services.tools.create_hash import CreateHash
 
 logger = Logger.get_logger(name=__name__)
 mongo = MongoConnection()
-create_hash = Create_hash()
+create_hash = CreateHash()
 producer = Producer()
 
 router = APIRouter(prefix="/add_person",tags=["add_person"])
