@@ -52,13 +52,13 @@ async def build_person(person: PersonModel, file: Optional[UploadFile] = File(No
 async def add_person(person: PersonModel = Depends(), file: Optional[UploadFile] = File(None)):
     person_data = await build_person(person, file)
     person_id = create_hash.made_a_hash(person.email)
-    if mongo.check_exists_by_id(settings.MONGO_COLL_PROFILES, person_id):
+    if mongo.check_exists_by_id(settings.MONGO_COLL_PROFILESS, person_id):
         logger.error(f"error:{person.email} already exists in the system !!!")
         return {"error": f"{person.email} already exists in the system !!!"}
 
     logger.info("create a id")
-    mongo.insert(settings.MONGO_COLL_PROFILES, {"unique_id": person_id, **person_data} ,person_id)
-    logger.info(f"inserted to mongo {settings.MONGO_COLL_PROFILES} collection :")
+    mongo.insert(settings.MONGO_COLL_PROFILESS, {"unique_id": person_id, **person_data} ,person_id)
+    logger.info(f"inserted to mongo {settings.MONGO_COLL_PROFILESS} collection :")
 
     person_to_kafka = {"unique_id":person_id,**person_data}
     producer.send_message(settings.TOPIC_PROFILES_CREATEDD,person_to_kafka)
@@ -68,7 +68,7 @@ async def add_person(person: PersonModel = Depends(), file: Optional[UploadFile]
 
 @router.get("/people")
 def get_people():
-    all_collection = mongo.get_collection(settings.MONGO_COLL_PROFILES)
+    all_collection = mongo.get_collection(settings.MONGO_COLL_PROFILESS)
     return all_collection
 
 

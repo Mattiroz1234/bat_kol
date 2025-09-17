@@ -9,6 +9,13 @@ class ElasticService:
         self.index = index_name
         self.es = Elastic(settings.ES_URL, index_name)
 
+    def upsert_doc(self, doc_id: str, doc: dict,refresh:str):
+        self.es.upsert_doc(
+            doc_id=doc_id,
+            doc=doc,
+            refresh=refresh
+        )
+
     def match_search(self,doc_id, size:int = 1):
 
         doc = self.es.get_doc(doc_id)

@@ -21,7 +21,7 @@ class Consumer:
         enable_auto_commit: bool = True,
     ):
         self.consumer: Optional[KafkaConsumer] = None
-        brokers = bootstrap_servers or settings.KAFKA_BROKERSS
+        brokers = bootstrap_servers or settings.KAFKA_BROKERS
         try:
             self.consumer = KafkaConsumer(
                 *topics,

@@ -10,7 +10,7 @@ from common.config import settings
 router = APIRouter(prefix="/login",tags=["login"])
 
 client = MongoClient(settings.MONGO_URI)
-db = client[settings.MONGO_DBMONGO_DB]
+db = client[settings.MONGO_DB]
 users = db["users"]
 
 SECRET_KEY = "mysecretkey"

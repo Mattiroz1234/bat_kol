@@ -7,7 +7,7 @@ logger = Logger.get_logger(name=__name__)
 router = APIRouter(prefix="/waiting_matches", tags=["waiting_matches"])
 
 feedback_collection = mongo.get_collection(settings.MONGO_COLLECTION_LIKES)
-profiles_collection = mongo.get_collection(settings.MONGO_COLL_PROFILES)
+profiles_collection = mongo.get_collection(settings.MONGO_COLL_PROFILESS)
 
 @router.get("/{actor_id}")
 def get_waiting_matches(actor_id: str):
