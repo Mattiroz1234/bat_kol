@@ -8,7 +8,7 @@ mongoService = MongoService()
 model = SentenceTransformer("all-MiniLM-L6-v2")
 logger = Logger.get_logger(name=__name__)
 
-def match(profile:dict, topic:list = [settings.TOPIC_PROFILES_CREATEDD]):
+def match_server(profile:dict, topic:list = [settings.TOPIC_PROFILES_CREATEDD]):
     logger.info(f"start consumer listen - topic: {topic}")
 
     index_name = "female"
